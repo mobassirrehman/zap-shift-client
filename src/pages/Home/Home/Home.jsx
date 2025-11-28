@@ -5,6 +5,9 @@ import OurServices from "../../../components/OurServices/OurServices";
 import Brands from "../Brands/Brands";
 import WhyChooseUs from "../../../components/WhyChooseUs/WhyChooseUs";
 import MerchantCTA from "../../../components/MerchantCTA/MerchantCTA";
+import Reviews from "../Reviews/Reviews";
+
+const reviewsPromise = fetch("/reviews.json").then((res) => res.json());
 
 const Home = () => {
   return (
@@ -15,6 +18,7 @@ const Home = () => {
       <Brands></Brands>
       <WhyChooseUs></WhyChooseUs>
       <MerchantCTA></MerchantCTA>
+      <Reviews reviewsPromise={reviewsPromise}></Reviews>
     </div>
   );
 };

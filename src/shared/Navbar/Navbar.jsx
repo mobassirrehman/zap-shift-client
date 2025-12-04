@@ -8,27 +8,34 @@ const NavBar = () => {
 
   const handleLogOut = () => {
     logOut()
-      .then(() => {
-        // Successfully logged out
-      })
+      .then()
       .catch((error) => {
-        console.error("Logout error:", error);
+        console.log(error);
       });
   };
+
   const links = (
     <>
       <li>
         <NavLink to="">Services</NavLink>
       </li>
       <li>
-        <NavLink to="/aboutus">About Us</NavLink>
+        <NavLink to="">About Us</NavLink>
+      </li>
+      <li>
+        <NavLink to="/send-parcel">Send Parcel</NavLink>
       </li>
       <li>
         <NavLink to="/coverage">Coverage</NavLink>
       </li>
-      <li>
-        <NavLink to="/send-parcel">Send a Parcel</NavLink>
-      </li>
+
+      {user && (
+        <>
+          <li>
+            <NavLink to="/dashboard/my-parcels">My Parcels</NavLink>
+          </li>
+        </>
+      )}
     </>
   );
   return (
@@ -59,9 +66,9 @@ const NavBar = () => {
             {links}
           </ul>
         </div>
-        <div className="btn btn-ghost text-xl">
-          <Logo />
-        </div>
+        <a className="btn btn-ghost text-xl">
+          <Logo></Logo>
+        </a>
       </div>
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1">{links}</ul>

@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import useAuth from "../../../hooks/useAuth";
 import { Link, useLocation, useNavigate } from "react-router";
 import SocialLogin from "../SocialLogin/SocialLogin";
 import axios from "axios";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 
 const Register = () => {
   const {
@@ -14,12 +15,9 @@ const Register = () => {
   const { registerUser, updateUserProfile } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const axiosSecure = useAxiosSecure();
 
   const handleRegistration = (data) => {
-    setLoading(true);
-    setError("");
     const profileImg = data.photo[0];
 
     registerUser(data.email, data.password)
@@ -28,79 +26,51 @@ const Register = () => {
         const formData = new FormData();
         formData.append("image", profileImg);
 
-        // 2. send the photo to store and get the url
+        // 2. send the photo to store and get the ul
         const image_API_URL = `https://api.imgbb.com/1/upload?key=${
           import.meta.env.VITE_image_host_key
         }`;
 
-        axios
-          .post(image_API_URL, formData)
-          .then((res) => {
-            // update user profile to firebase
-            updateUserProfile(data.name, res.data.data.url)
-              .then(() => {
-                navigate(location.state || "/");
-              })
-              .catch((error) => {
-                setError(error.message);
-              });
-          })
-          .catch(() => {
-            setError("Failed to upload image. Please try again.");
+        axios.post(image_API_URL, formData).then((res) => {
+          const photoURL = res.data.data.url;
+
+          // create user in the database
+          const userInfo = {
+            email: data.email,
+            displayName: data.name,
+            photoURL: photoURL,
+          };
+          axiosSecure.post("/users", userInfo).then((res) => {
+            if (res.data.insertedId) {
+              console.log("user created in the database");
+            }
           });
+
+          // update user profile to firebase
+          const userProfile = {
+            displayName: data.name,
+            photoURL: photoURL,
+          };
+
+          updateUserProfile(userProfile)
+            .then(() => {
+              console.log("user profile updated done.");
+              navigate(location.state || "/");
+            })
+            .catch((error) => console.log(error));
+        });
       })
       .catch((error) => {
-        const errorMessage = getErrorMessage(error.code);
-        setError(errorMessage);
-      })
-      .finally(() => {
-        setLoading(false);
+        console.log(error);
       });
-  };
-
-  const getErrorMessage = (errorCode) => {
-    switch (errorCode) {
-      case "auth/email-already-in-use":
-        return "This email is already registered.";
-      case "auth/invalid-email":
-        return "Invalid email address.";
-      case "auth/weak-password":
-        return "Password is too weak.";
-      default:
-        return "Registration failed. Please try again.";
-    }
   };
 
   return (
     <div className="card bg-base-100 w-full mx-auto max-w-sm shrink-0 shadow-2xl">
-      <div className="pt-8 px-8">
-        <h3 className="text-3xl text-center font-bold">Welcome to Zap Shift</h3>
-        <p className="text-center text-base-content/70 mt-2">
-          Create your account
-        </p>
-      </div>
-
+      <h3 className="text-3xl text-center">Welcome to Zap Shift</h3>
+      <p className="text-center">Please Register</p>
       <form className="card-body" onSubmit={handleSubmit(handleRegistration)}>
-        {error && (
-          <div role="alert" className="alert alert-error">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="stroke-current shrink-0 h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span>{error}</span>
-          </div>
-        )}
-
-        <div className="form-control">
+        <fieldset className="fieldset">
           {/* name field */}
           <label className="label">Name</label>
           <input
@@ -123,7 +93,7 @@ const Register = () => {
             placeholder="Your Photo"
           />
 
-          {errors.photo?.type === "required" && (
+          {errors.name?.type === "required" && (
             <p className="text-red-500">Photo is required.</p>
           )}
 
@@ -166,30 +136,16 @@ const Register = () => {
             </p>
           )}
 
-          <div className="form-control mt-6">
-            <button
-              type="submit"
-              className="btn btn-neutral"
-              disabled={loading}
-              aria-busy={loading}
-            >
-              {loading ? (
-                <>
-                  <span className="loading loading-spinner"></span>
-                  Registering...
-                </>
-              ) : (
-                "Register"
-              )}
-            </button>
+          <div>
+            <a className="link link-hover">Forgot password?</a>
           </div>
-        </div>
-
-        <p className="text-center mt-4">
-          Already have an account?{" "}
+          <button className="btn btn-neutral mt-4">Register</button>
+        </fieldset>
+        <p>
+          Already have an account{" "}
           <Link
             state={location.state}
-            className="text-blue-500 font-semibold hover:underline"
+            className="text-blue-400 underline"
             to="/login"
           >
             Login

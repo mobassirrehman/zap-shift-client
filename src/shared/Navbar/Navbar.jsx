@@ -66,18 +66,20 @@ const NavBar = () => {
             {links}
           </ul>
         </div>
-        <a className="btn btn-ghost text-xl">
-          <Logo></Logo>
-        </a>
+        <div className="btn btn-ghost text-xl">
+          <Link to="/">
+            <Logo />
+          </Link>
+        </div>
       </div>
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1">{links}</ul>
       </div>
       <div className="navbar-end">
         {user ? (
-          <a onClick={handleLogOut} className="btn">
+          <Link onClick={handleLogOut} className="btn">
             Log Out
-          </a>
+          </Link>
         ) : (
           <Link className="btn" to="/login">
             Log in

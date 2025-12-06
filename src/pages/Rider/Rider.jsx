@@ -36,7 +36,7 @@ const Rider = () => {
           position: "top-end",
           icon: "success",
           title:
-            "Your application has been submitted. We will reach to you in 145 days",
+            "Your application has been submitted. We will reach to you soon",
           showConfirmButton: false,
           timer: 2000,
         });

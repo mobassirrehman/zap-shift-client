@@ -17,6 +17,9 @@ import PaymentSuccess from "../pages/DashBoard/Payment/PaymentSuccess";
 import PaymentCancelled from "../pages/DashBoard/Payment/PaymentCancelled";
 import PaymentHistory from "../pages/DashBoard/PaymentHistory/PaymentHistory";
 import ApproveRiders from "../pages/DashBoard/ApproveRiders/ApproveRiders";
+import AdminRoute from "./AdminRoute";
+import AssignRiders from "../pages/DashBoard/AssignRider/AssignRider";
+import UsersManagement from "../pages/DashBoard/UsersManagement/UsersManagement";
 
 export const router = createBrowserRouter([
   {
@@ -31,9 +34,9 @@ export const router = createBrowserRouter([
       {
         path: "rider",
         element: (
-         <Privateroute>
-          <Rider></Rider>
-         </Privateroute>
+          <Privateroute>
+            <Rider></Rider>
+          </Privateroute>
         ),
         loader: () => fetch("/serviceCenters.json").then((res) => res.json()),
       },
@@ -101,7 +104,27 @@ export const router = createBrowserRouter([
       },
       {
         path: "approve-riders",
-        Component: ApproveRiders,
+        element: (
+          
+            <ApproveRiders></ApproveRiders>
+          
+        ),
+      },
+      {
+        path: "assign-riders",
+        element: (
+         
+            <AssignRiders></AssignRiders>
+          
+        ),
+      },
+      {
+        path: "users-management",
+        element: (
+         
+            <UsersManagement></UsersManagement>
+          
+        ),
       },
     ],
   },
